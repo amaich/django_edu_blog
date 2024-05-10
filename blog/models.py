@@ -4,7 +4,15 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 
+class PublishedManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(status=Post.Status.PUBLISHED)
+
+
 class Post(models.Model):
+
+    objects = models.Manager()
+    published = PublishedManager()
 
     class Status(models.TextChoices):
         DRAFT = 'DF', 'Draft'
@@ -16,9 +24,9 @@ class Post(models.Model):
                                on_delete=models.CASCADE,
                                related_name='blog_posts')
     body = models.TextField()
-    publish = models.DateField(default=timezone.now)
-    created = models.DateField(auto_now_add=True)
-    updated = models.DateField(auto_now=True)
+    publish = models.DateTimeField(default=timezone.now)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=2,
                               choices=Status.choices,
                               default=Status.DRAFT)
